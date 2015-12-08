@@ -5,17 +5,56 @@ module Thumbnailer::Resize
     %i(jpg png tif tiff bmp pcx dng dot ico tga gif eps ps svg pnm)
   end
 
+  def process(file)
+    if Thumbnailer.which('convert')
+      case mode
+      when :crop
+        `convert "#{file}" -resize #{square}^ -gravity #{gravity} -extent #{square} "#{file}"`
+      when :scale
+        `convert -define #{format}:size=#{dimensions(file).join('x')} "#{file}" -thumbnail #{square} "#{file}"`
+      when :pad
+        `convert -define #{format}:size=#{dimensions(file).join('x')} "#{file}" -thumbnail #{square} -background #{background_color} -gravity #{gravity} -extent #{square} "#{file}"`
+      else
+        raise "invalid mode given: '#{mode}'"
+      end
+      $?.exitstatus==0 ? file : nil
+    else
+      raise "ImageMagick is required to generate thumbnails, please install using your package manager."
+    end
+  end
+
+  private
+
+  def dimensions(file)
+    dim = `identify -ping -format "%w %h" "#{file}"`
+    if $?.exitstatus!=0 || dim !~ /\d+ \d+/
+      return nil
+    else
+      dim.split.map(&:to_i)
+    end
+  end
+
+  def gravity
+    "center"
+  end
+
+  def format
+    "jpeg"
+  end
+
+  def mode
+    Thumbnailer.config.mode.to_sym
+  end
+
+  def background_color
+    Thumbnailer.config.background_color
+  end
+
   def size
     Thumbnailer.config.thumbnail_size
   end
 
   def square
     "#{size}x#{size}"
-  end
-
-  def process(file, output)
-    return nil if !Thumbnailer.which('convert')
-    `convert "#{file}" -resize #{square}^ -gravity center -extent #{square} "#{output}"`
-    $?.exitstatus==0 ? output : nil
   end
 end
