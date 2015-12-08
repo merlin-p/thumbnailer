@@ -3,6 +3,5 @@ rvm:
   - 2.2.3
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y mplayer imagemagick
-  - bundle install
+  - sudo apt-get install -y mplayer imagemagick libreoffice
 script: bundle exec rspec spec
