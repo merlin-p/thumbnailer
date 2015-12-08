@@ -2,3 +2,4 @@ source 'https://rubygems.org'
 
 # Specify your gem's dependencies in thumbnailer.gemspec
 gemspec
+gem 'rspec'
