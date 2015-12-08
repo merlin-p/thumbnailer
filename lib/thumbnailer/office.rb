@@ -17,6 +17,8 @@ module Thumbnailer
         if $?.exitstatus==0 && (file = Dir["#{temp}/*.pdf"].first)
           PDF.process(file, output)
         end
+      else
+        raise "OpenOffice or LibreOffice is required to generate thumbnails for office documents: #{supported_formats.join(', ')}"
       end
     end
   end
