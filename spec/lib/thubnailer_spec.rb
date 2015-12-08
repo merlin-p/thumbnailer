@@ -10,8 +10,7 @@ RSpec.describe Thumbnailer do
   end
 
   describe 'create' do
-    let!(:gem_root) { "./" || Gem::Specification.find_by_name("thumbnailer").gem_dir }
-    let(:sample) { "#{gem_root}/spec/fixtures/thumbnailer/sample" }
+    let(:sample) { "spec/fixtures/thumbnailer/sample" }
 
     before do
       described_class.config.cache_path = Dir.mktmpdir
