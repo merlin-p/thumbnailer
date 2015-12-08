@@ -17,6 +17,14 @@ RSpec.describe Thumbnailer do
       described_class.config.cache_path = Dir.mktmpdir
     end
 
+    it "creates thumbs for all scaling modes" do
+      %i(crop scale pad).each do |mode|
+        described_class.config.mode = mode
+        file = described_class.create("#{sample}.jpg")
+        expect(File.size(file)).to be > 125 # ~minimum jpeg size with header
+      end
+    end
+
     %i(jpg png bmp tif mp4 docx).each do |type|
       it "creates a file with size >0 for #{type} format" do
         file = described_class.create("#{sample}.#{type}")
