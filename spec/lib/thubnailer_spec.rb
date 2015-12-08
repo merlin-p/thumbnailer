@@ -17,7 +17,7 @@ RSpec.describe Thumbnailer do
       described_class.config.cache_path = Dir.mktmpdir
     end
 
-    [:jpg, :png, :bmp, :tif, :mp4, :docx, :blend, :stl, :"3ds"].each do |type|
+    %i(jpg png bmp tif mp4 docx).each do |type|
       it "creates a file with size >0 for #{type} format" do
         file = described_class.create("#{sample}.#{type}")
         expect(File.size(file)).to be > 125 # ~minimum jpeg size with header
