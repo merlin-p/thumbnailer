@@ -15,6 +15,8 @@ module Thumbnailer
         `gs -dNOPAUSE -dBATCH -r#{render_dpi} -sDEVICE=jpeg -sOutputFile="#{output}" -dFirstPage=1 -dLastPage=1 "#{file}"`
       elsif Thumbnailer.which 'convert'
         `convert -density #{render_dpi} -trim "#{file}[0]" -quality 100 "#{output}"`
+      else
+        raise "Ghostscript or ImageMagick is required to generate thumbnails for PDFs"
       end
       $?.exitstatus==0
     end

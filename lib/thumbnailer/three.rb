@@ -16,6 +16,8 @@ module Thumbnailer::Three
       `"#{blender}" "#{file}" -P "#{temp}/render.py"`
       FileUtils.rm_rf temp
       $?.exitstatus==0 && File.exists?(output)
+    else
+      raise "Blender is required to generate thumbnails for 3D Files: #{supported_formats.join(', ')}"
     end
   end
 
