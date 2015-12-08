@@ -1,3 +1,8 @@
 language: ruby
 rvm:
-  - 2.2.0
+  - 2.2.3
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y mplayer imagemagick
+  - bundle install
+script: bundle exec rspec spec
