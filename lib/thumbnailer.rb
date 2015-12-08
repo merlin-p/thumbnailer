@@ -24,7 +24,9 @@ module Thumbnailer
         thumbnail_size: 64,
         render_dpi: 90,
         video_skip_to: 1,
-        cache_path: "/tmp"
+        cache_path: "/tmp",
+        mode: :pad,
+        background_color: :white
     )
   end
 
@@ -35,14 +37,14 @@ module Thumbnailer
   end
 
   def create(file)
-    using_cache(file) do |cfile|
+    using_cache(file) do |cache|
       file_type = file_ext(file)
       if Resize.supported_formats.include?(file_type)
-        FileUtils.cp(file, cfile)
+        FileUtils.cp(file, cache)
       else
-        module_by_filetype(file_type).send(:process, file, cfile)
+        module_by_filetype(file_type).send(:process, file, cache)
       end
-      Resize.process(cfile, cfile)
+      Resize.process(cache)
     end
   end
 
@@ -50,6 +52,12 @@ module Thumbnailer
     @which_cache[name] ||= (
       find_executable(name.to_s) || Dir.glob("{#{ENV['HOME']},}/Applications/*.app/Contents/MacOS/#{name}").first
     )
+  end
+
+  def reset!
+    Dir.glob( File.join( config.cache_path, '*.jpg' ) )
+      .select { |file| File.basename(file) =~ /[a-f\d]{7,8}\.jpg/ }
+      .each   { |file| File.delete(file) }
   end
 
   private
@@ -61,27 +69,33 @@ module Thumbnailer
     end
 
     def find_executable(name)
-      if file_path = ENV['PATH'].split(':').select{ |path| File.exists?(File.join(path, name)) }.first
+      if file_path = find_path(name)
         File.join(file_path, name)
       end
     end
 
+    def find_path(name)
+      ENV['PATH']
+        .split(':')
+        .select { |path| File.exists?(File.join(path, name)) }
+        .first
+    end
+
     def supported_formats
-      thumbnailer_modules.flat_map(&:supported_formats)
+      thumbnailer_modules
+        .flat_map(&:supported_formats)
     end
 
     def module_by_filetype(type)
-      thumbnailer_modules.select { |mod|
-        mod.respond_to?(:supported_formats) && mod.supported_formats.include?(type.downcase.to_sym)
-      }.first
+      thumbnailer_modules
+        .select { |mod| mod.respond_to?(:supported_formats) && mod.supported_formats.include?(type.downcase.to_sym) }
+        .first
     end
 
     def thumbnailer_modules
-      constants.select { |component|
-        const_get(component).is_a? Module
-      }.map { |mod|
-        const_get(mod)
-      }
+      constants
+        .select { |com| const_get(com).is_a? Module }
+        .map    { |mod| const_get(mod) }
     end
 
     def cache_path
