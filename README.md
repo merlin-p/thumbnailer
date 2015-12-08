@@ -1,4 +1,5 @@
 # Thumbnailer
+![Build Status](https://travis-ci.org/merlin-p/thumbnailer.svg)
 
 ## Setup
 
