@@ -48,7 +48,7 @@ module Thumbnailer
 
   def which(name)
     @which_cache[name] ||= (
-      find_executable(name) || Dir.glob("{#{ENV['HOME']},}/Applications/*.app/Contents/MacOS/#{name}").first
+      find_executable(name.to_s) || Dir.glob("{#{ENV['HOME']},}/Applications/*.app/Contents/MacOS/#{name}").first
     )
   end
 
