@@ -63,6 +63,11 @@ module Thumbnailer
       .each   { |file| File.delete(file) }
   end
 
+  def supported_formats
+    thumbnailer_modules
+      .flat_map(&:supported_formats)
+  end
+
   private
 
     def using_cache(file)
@@ -82,11 +87,6 @@ module Thumbnailer
         .split(':')
         .select { |path| File.exists?(File.join(path, name)) }
         .first
-    end
-
-    def supported_formats
-      thumbnailer_modules
-        .flat_map(&:supported_formats)
     end
 
     def module_by_filetype(type)
