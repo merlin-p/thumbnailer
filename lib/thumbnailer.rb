@@ -41,8 +41,10 @@ module Thumbnailer
       file_type = file_ext(file)
       if Resize.supported_formats.include?(file_type)
         FileUtils.cp(file, cache)
-      else
+      elsif supported_formats.include?(file_type)
         module_by_filetype(file_type).send(:process, file, cache)
+      else
+        return nil
       end
       Resize.process(cache)
     end
