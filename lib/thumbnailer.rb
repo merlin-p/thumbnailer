@@ -26,7 +26,8 @@ module Thumbnailer
         video_skip_to: 1,
         cache_path: "/tmp",
         mode: :pad,
-        background_color: :white
+        background_color: :white,
+        quality: 75
     )
   end
 
@@ -70,9 +71,9 @@ module Thumbnailer
 
   private
 
+    # 2.2.3 :001 > File.exists?("\0")
+    # ArgumentError: string contains null byte
     def save_exists?(file)
-      # 2.2.3 :001 > File.exists?("\0")
-      # ArgumentError: string contains null byte
       File.exists?(file) rescue nil
     end
 
