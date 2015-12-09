@@ -10,11 +10,11 @@ module Thumbnailer::Resize
       return unless dimensions(file)
       case mode
       when :crop
-        `convert "#{file}" -resize #{square}^ -gravity #{gravity} -extent #{square} "#{file}"`
+        `convert -quality #{quality} "#{file}" -resize #{square}^ -gravity #{gravity} -extent #{square} "#{file}"`
       when :scale
-        `convert -define #{format}:size=#{dimensions(file).join('x')} "#{file}" -thumbnail #{square} "#{file}"`
+        `convert -quality #{quality} -define #{format}:size=#{dimensions(file).join('x')} "#{file}" -thumbnail #{square} "#{file}"`
       when :pad
-        `convert -define #{format}:size=#{dimensions(file).join('x')} "#{file}" -thumbnail #{square} -background #{background_color} -gravity #{gravity} -extent #{square} "#{file}"`
+        `convert -quality #{quality} -define #{format}:size=#{dimensions(file).join('x')} "#{file}" -thumbnail #{square} -background #{background_color} -gravity #{gravity} -extent #{square} "#{file}"`
       else
         raise "invalid mode given: '#{mode}'"
       end
@@ -41,6 +41,10 @@ module Thumbnailer::Resize
 
   def format
     "jpeg"
+  end
+
+  def quality
+    Thumbnailer.config.quality.to_i
   end
 
   def mode
