@@ -37,6 +37,7 @@ module Thumbnailer
   end
 
   def create(file)
+    return nil unless (File.exists?(file) && File.size(file)>1000)
     using_cache(file) do |cache|
       file_type = file_ext(file)
       if Resize.supported_formats.include?(file_type)
