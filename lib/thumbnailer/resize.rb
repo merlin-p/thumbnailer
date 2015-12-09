@@ -7,6 +7,7 @@ module Thumbnailer::Resize
 
   def process(file)
     if Thumbnailer.which('convert')
+      return unless dimensions(file)
       case mode
       when :crop
         `convert "#{file}" -resize #{square}^ -gravity #{gravity} -extent #{square} "#{file}"`
