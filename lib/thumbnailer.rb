@@ -37,7 +37,7 @@ module Thumbnailer
   end
 
   def create(file)
-    return nil unless (File.exists?(file) && File.size(file)>1000)
+    return nil unless (file.is_a?(String) && save_exists?(file) && File.size(file)>1000)
     using_cache(file) do |cache|
       file_type = file_ext(file)
       if Resize.supported_formats.include?(file_type)
@@ -63,7 +63,18 @@ module Thumbnailer
       .each   { |file| File.delete(file) }
   end
 
+  def supported_formats
+    thumbnailer_modules
+      .flat_map(&:supported_formats)
+  end
+
   private
+
+    def save_exists?(file)
+      # 2.2.3 :001 > File.exists?("\0")
+      # ArgumentError: string contains null byte
+      File.exists?(file) rescue nil
+    end
 
     def using_cache(file)
       cfile = cache_file(file)
@@ -82,11 +93,6 @@ module Thumbnailer
         .split(':')
         .select { |path| File.exists?(File.join(path, name)) }
         .first
-    end
-
-    def supported_formats
-      thumbnailer_modules
-        .flat_map(&:supported_formats)
     end
 
     def module_by_filetype(type)
