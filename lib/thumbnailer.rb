@@ -31,10 +31,20 @@ module Thumbnailer
     )
   end
 
-  def config(&blk)
+  def config(opts=nil)
     @config ||= default_options
-    blk.call(@config) if block_given?
+    @config =   OpenStruct.new(@config.to_h.merge(opts)) if opts
+    yield(@config) if block_given?
     @config
+  end
+
+  def with_options(opts)
+    if block_given?
+      old_config = config.to_h
+      @config = OpenStruct.new(old_config.merge(opts))
+      yield(self)
+      @config = OpenStruct.new(old_config)
+    end
   end
 
   def create(file, output=nil)
