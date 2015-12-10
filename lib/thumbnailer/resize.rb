@@ -56,7 +56,7 @@ module Thumbnailer::Resize
   end
 
   def size
-    Thumbnailer.config.thumbnail_size
+    Thumbnailer.config.thumbnail_size || Thumbnailer.config.size
   end
 
   def square

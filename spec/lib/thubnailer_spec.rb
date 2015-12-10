@@ -30,8 +30,15 @@ RSpec.describe Thumbnailer do
       File.delete(output)
     end
 
-    it "scales images according to thumbnail_size" do
+    it "uses deprecated parameter" do
       described_class.config.thumbnail_size = size
+      file = described_class.create(default)
+      expect( dimensions(file) ).to include(size)
+      described_class.config.thumbnail_size = nil
+    end
+
+    it "scales images according to thumbnail_size" do
+      described_class.config.size = size
       file = described_class.create(default)
       expect( dimensions(file) ).to include(size)
     end
