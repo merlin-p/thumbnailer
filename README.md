@@ -5,13 +5,38 @@
 
 requires imagemagick + either mplayer or ffmpeg installed and available in your path
 
-osx:
+**osx**: `brew install imagemagick mplayer Caskroom/cask/blender Caskroom/cask/libreoffice`
 
-`brew install imagemagick mplayer Caskroom/cask/blender Caskroom/cask/libreoffice`
+**linux**: `sudo apt-get install imagemagick mplayer blender libreoffice`
 
-linux:
+## Usage
+add to your **Gemfile**:
+`gem 'thumbnailer', git: 'https://github.com/merlin-p/thumbnailer.git'`
 
-`sudo apt-get install imagemagick mplayer blender libreoffice`
+configure (optional):
+```
+# direct manipulation
+Thumbnailer.config.mode = :pad
+
+# set options only for a given block
+Thumbnailer.with_options(quality: 100, size: 512) { |t| t.create(input, output) }
+
+# configure using a block
+Thumbnailer.config do |c|
+  c.size = 128
+  c.cache_path = "#{Rails.root}/tmp/cache/assets/#{Rails.env}/thumbnails/"
+  c.render_dpi = 45
+  c.mode = :pad
+  c.background_color = :blue
+end
+```
+
+`Thumbnailer.create("my.file")` and you'll get the full filename (including path) to your thumbnail. in case there are problems (e.g. with processing, input or output) it returns nil. when using a supported format without the required application installed it will raise an exception.
+
+an output filename is optional (should always end in .jpg ATM):
+
+`Thumbnailer.create("my.file", "my.output")`
+
 
 ## Configuration
 
@@ -39,31 +64,18 @@ can be either :scale (scale adjusting the larger side to fit thumbnail_size), :c
 
 standard ImageMagick colors, check out "List of Color Names" over here: http://www.imagemagick.org/script/color.php
 
+## Supported Formats
 
-## Usage
-add to your gemfile:
-`gem 'thumbnailer', git: 'https://github.com/merlin-p/thumbnailer.git'`
+currently there is support for Office formats including PDF (using libre/openoffice), Images (using ImageMagick), Videos (using mplayer or ffmpeg) and 3D formats (using blender). 3D rendering will not work on a headless setup and has issues with some formats, so its use is discouraged at the moment.
 
-configure (optional):
-```
-# direct manipulation
-Thumbnailer.config.mode = :pad
+Images
+- jpg, png, tif, tiff, bmp, pcx, dng, dot, ico, tga, gif, eps, ps, svg, pnm, ai, psd
 
-# set options only for a given block
-Thumbnailer.with_options(quality: 100, size: 512) { |t| t.create(input, output) }
+Office
+- doc, docx, xls, xlsx, ppt, pptx, pdf
 
-# configure using a block
-Thumbnailer.config do |c|
-  c.size = 128
-  c.cache_path = "#{Rails.root}/tmp/cache/assets/#{Rails.env}/thumbnails/"
-  c.render_dpi = 45
-  c.mode = :pad
-  c.background_color = :blue
-end
-```
+Videos
+- mp4, m4v, mp2, m2v, mkv, avi, mov, qt, rm, rmvb, asf, flv, ogm, dv, mpg, mpeg, wmv
 
-`Thumbnailer.create("my.file")` and you'll get the full filename (including path) to your thumbnail. in case there are problems (e.g. with processing, input or output) it returns nil. when using a supported format without the required application installed it will raise an exception.
-
-an output filename is optional (should always end in .jpg ATM):
-
-`Thumbnailer.create("my.file", "my.output")`
+3D
+- blend, 3ds, obj, stl, dae
