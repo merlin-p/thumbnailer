@@ -21,7 +21,7 @@ module Thumbnailer
 
   def default_options
     OpenStruct.new(
-        thumbnail_size: 64,
+        size: 64,
         render_dpi: 90,
         video_skip_to: 1,
         cache_path: "/tmp",

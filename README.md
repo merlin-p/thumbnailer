@@ -54,7 +54,7 @@ Thumbnailer.with_options(quality: 100, size: 512) { |t| t.create(input, output) 
 
 # configure using a block
 Thumbnailer.config do |c|
-  c.thumbnail_size = 128
+  c.size = 128
   c.cache_path = "#{Rails.root}/tmp/cache/assets/development/thumbnails/"
   c.render_dpi = 45
   c.mode = :pad
