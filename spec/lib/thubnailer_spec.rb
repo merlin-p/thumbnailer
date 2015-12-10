@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Thumbnailer do
-  describe 'config' do
+  describe '.config' do
     let(:new_path) { "/tmp/testing" }
     it 'can be configured' do
       described_class.config.cache_path = new_path
@@ -14,27 +14,40 @@ RSpec.describe Thumbnailer do
     end
   end
 
-  describe 'create' do
-    let(:sample) { "spec/fixtures/thumbnailer/sample" }
+  describe '.create' do
+    let(:sample)  { "spec/fixtures/thumbnailer/sample" }
+    let(:default) { "#{sample}.jpg" }
+    let(:size)    { 8 + Random.rand(256) }
+    let(:output)  { "#{tempname}.jpg" }
 
     before do
       described_class.config.cache_path = Dir.mktmpdir
     end
 
+    it "respects output file" do
+      described_class.create(default, output)
+      expect( valid_image?(output) ).to be true
+      File.delete(output)
+    end
+
+    it "scales images according to thumbnail_size" do
+      described_class.config.thumbnail_size = size
+      file = described_class.create(default)
+      expect( dimensions(file) ).to include(size)
+    end
+
     it "creates thumbs for all scaling modes" do
       %i(crop scale pad).each do |mode|
         described_class.config.mode = mode
-        file = described_class.create("#{sample}.jpg")
+        file = described_class.create(default)
         expect( valid_image?(file) ).to be true
-        expect( File.size(file) ).to be > 125 # ~minimum jpeg size with header
       end
     end
 
-    %i(jpg png bmp tif mp4 docx eps ai).each do |type|
-      it "creates a image file for #{type} format" do
-        file = described_class.create("#{sample}.#{type}")
+    it "creates thumbnails for various formats" do
+      %i(jpg mp4 docx eps ai).each do |ext|
+        file = described_class.create("#{sample}.#{ext}")
         expect( valid_image?(file) ).to be true
-        expect( File.size(file) ).to be > 125 # ~minimum jpeg size with header
       end
     end
 
@@ -71,13 +84,11 @@ RSpec.describe Thumbnailer do
       end
     end
 
-    after do
-      FileUtils.rm_rf( described_class.config.cache_path )
-    end
+    after { FileUtils.rm_rf( described_class.config.cache_path ) }
 
   end
 
-  describe 'which' do
+  describe '.which' do
     let(:name)    { "sh" }
     let(:target)  { "/bin/sh" }
 
@@ -86,7 +97,7 @@ RSpec.describe Thumbnailer do
     end
   end
 
-  describe 'reset!' do
+  describe '.reset!' do
     before(:all) do
       @temp = Dir.mktmpdir
       @files = []
@@ -96,12 +107,20 @@ RSpec.describe Thumbnailer do
       formats.each do |ext|
         @files.push described_class.create("#{@sample}.#{ext}")
       end
+
+      @injected_file = File.join(@temp, 'some other file.sh')
+
+      File.write(@injected_file, "CONTENT")
     end
 
-    it "deletes all thumbnails in the directory" do
-      expect( Dir.glob("#{@temp}/*.*") ).to match_array(@files)
+    it "deletes all thumbnails in the directory and no other files" do
+      expect( Dir.glob("#{@temp}/*.*") ).to match_array(@files.compact + [@injected_file])
       described_class.reset!
-      expect( Dir.glob("#{@temp}/*.*") ).to eq []
+      expect( Dir.glob("#{@temp}/*.*") ).to eq [@injected_file]
+    end
+
+    it "leaves other files unharmed" do
+      expect( File.read(@injected_file) ).to eq "CONTENT"
     end
 
     after(:all) do
