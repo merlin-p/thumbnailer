@@ -112,18 +112,22 @@ module Thumbnailer
         .map    { |mod| const_get(mod) }
     end
 
+    def checksum(input)
+      Zlib.crc32(input, 0).to_s(16)
+    end
+
     def cache_path
       cache = config.cache_path
       FileUtils.mkdir_p(cache) unless Dir.exists?(cache)
       cache
     end
 
-    def checksum(input)
-      Zlib.crc32(input, 0).to_s(16)
+    def cache_file(file)
+      "#{cache_path}/#{cache_id(file)}.jpg"
     end
 
-    def cache_file(file)
-      "#{cache_path}/#{checksum(File.read(file))}.jpg"
+    def cache_id(file)
+      checksum("#{File.read(file)}#{config.to_h.to_s}")
     end
 
     def file_ext(file)
