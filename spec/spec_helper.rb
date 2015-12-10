@@ -5,9 +5,12 @@ require_relative '../lib/thumbnailer.rb'
 module SpecHelpers
   def valid_image?(file)
     return nil unless File.exists?(file)
-    # if we do not have imagemagick here, tests would have failed already :)
-    dimensions = `identify -ping -format '%w %h' "#{file}"`.split.map(&:to_i)
-    dimensions.map(&8.method(:<=)).all?
+    dimensions(file).inject(:+) > 8
+  end
+
+  def dimensions(file)
+    return nil unless File.exists?(file)
+    `identify -ping -format '%w %h' "#{file}"`.split.map(&:to_i)
   end
 
   def random_bin(length=8)
@@ -19,7 +22,9 @@ module SpecHelpers
   end
 
   def formats
-    %i(jpg png bmp tif mp4 docx eps ai)
+    Thumbnailer.send(:thumbnailer_modules)
+      .select { |m| m != Thumbnailer::Three }
+      .map    { |m| m.supported_formats.first }
   end
 end
 
