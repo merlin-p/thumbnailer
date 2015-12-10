@@ -30,7 +30,7 @@ RSpec.describe Thumbnailer do
       end
     end
 
-    %i(jpg png bmp tif mp4 docx).each do |type|
+    %i(jpg png bmp tif mp4 docx eps ai).each do |type|
       it "creates a image file for #{type} format" do
         file = described_class.create("#{sample}.#{type}")
         expect( valid_image?(file) ).to be true
