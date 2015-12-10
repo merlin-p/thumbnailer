@@ -37,7 +37,7 @@ module Thumbnailer
     @config
   end
 
-  def create(file)
+  def create(file, output=nil)
     return nil unless (file.is_a?(String) && save_exists?(file) && File.size(file)>1000)
     using_cache(file) do |cache|
       file_type = file_ext(file)
@@ -48,7 +48,11 @@ module Thumbnailer
       else
         return nil
       end
-      Resize.process(cache)
+      out_file = Resize.process(cache)
+      if output && output.is_a?(String)
+        FileUtils.cp(cache, output)
+      end
+      out_file
     end
   end
 

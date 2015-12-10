@@ -2,7 +2,7 @@ module Thumbnailer::Video
   extend self
 
   def supported_formats
-    %i(mp4 mp2 m2v mkv avi mov qt m4v rm rmvb asf flv ogm dv)
+    %i(mp4 m4v mp2 m2v mkv avi mov qt rm rmvb asf flv ogm dv mpg mpeg wmv)
   end
 
   def skip_to
