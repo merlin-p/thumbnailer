@@ -41,14 +41,24 @@ standard ImageMagick colors, check out "List of Color Names" over here: http://w
 
 
 ## Usage
+add to your gemfile:
+`gem 'thumbnailer', git: 'https://github.com/merlin-p/thumbnailer.git'`
+
 configure (optional):
 ```
+# direct manipulation
+Thumbnailer.config.mode = :pad
+
+# set options only for a given block
+Thumbnailer.with_options(quality: 100, size: 512) { |t| t.create(input, output) }
+
+# configure using a block
 Thumbnailer.config do |c|
   c.thumbnail_size = 128
   c.cache_path = "#{Rails.root}/tmp/cache/assets/development/thumbnails/"
   c.render_dpi = 45
   c.mode = :pad
-  c.background_color = "black"
+  c.background_color = :blue
 end
 ```
 
