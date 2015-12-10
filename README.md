@@ -53,3 +53,7 @@ end
 ```
 
 `Thumbnailer.create("my.file")` and you'll get the full filename (including path) to your thumbnail. in case there are problems (e.g. with processing, input or output) it returns nil. when using a supported format without the required application installed it will raise an exception.
+
+an output filename is optional (should always end in .jpg ATM):
+
+`Thumbnailer.create("my.file", "my.output")`

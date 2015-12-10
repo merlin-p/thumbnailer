@@ -19,7 +19,7 @@ module SpecHelpers
   end
 
   def formats
-    %i(jpg png bmp tif mp4 docx)
+    %i(jpg png bmp tif mp4 docx eps ai)
   end
 end
 

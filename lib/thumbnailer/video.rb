@@ -2,7 +2,7 @@ module Thumbnailer::Video
   extend self
 
   def supported_formats
-    %i(mp4 mp2 m2v mkv avi mov qt m4v rm rmvb asf flv ogm dv)
+    %i(mp4 m4v mp2 m2v mkv avi mov qt rm rmvb asf flv ogm dv mpg mpeg wmv)
   end
 
   def skip_to
@@ -15,7 +15,7 @@ module Thumbnailer::Video
       Dir.chdir(temp) do
         if Thumbnailer.which 'mplayer'
           `mplayer "#{file}" -ss #{skip_to} -nosound -vo png -frames 1 2>/dev/null`
-          return nil if $?.exitstatus!=0
+          return nil if $?.exitstatus!=0 || Dir["*.png"].empty?
           File.rename Dir["*.png"].first, output
         elsif Thumbnailer.which 'ffmpeg'
           `ffmpeg -i "#{file}" -ss 00:00:#{skip_to.to_s.rjust(2, '0')}.000 -vframes 1 #{output}`

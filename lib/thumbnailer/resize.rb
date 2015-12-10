@@ -2,7 +2,7 @@ module Thumbnailer::Resize
   extend self
 
   def supported_formats
-    %i(jpg png tif tiff bmp pcx dng dot ico tga gif eps ps svg pnm)
+    %i(jpg png tif tiff bmp pcx dng dot ico tga gif eps ps svg pnm ai psd)
   end
 
   def process(file)
